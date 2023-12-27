@@ -1,16 +1,13 @@
 package com.example.testforme.controller;
 
-import com.example.testforme.dto.AccountsCreateRequestDTO;
-import com.example.testforme.dto.AccountsDeleteDTO;
-import com.example.testforme.dto.AccountsRequestDTO;
-import com.example.testforme.dto.AccountsResponseDTO;
+import com.example.testforme.dto.*;
+import com.example.testforme.entity.Accounts;
 import com.example.testforme.service.AccountsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth/accounts")
@@ -34,10 +31,16 @@ public class AccountsController {
         return ResponseEntity.ok(new AccountsResponseDTO("Account was updated successfully"));
     }
     @PostMapping("/getAll")
-    public ResponseEntity<AccountsResponseDTO> getAllAccounts(@RequestBody String  userId) {
-        service.getAll(userId);
-        return ResponseEntity.ok(new AccountsResponseDTO("Accounts were received successfully"));
+    public ResponseEntity<List<AccountsDto>> getAllAccounts(@RequestBody String  token) {
+
+        return ResponseEntity.ok(service.getAll(token));
     }
+
+//    @PostMapping("/getByToken")
+//    public ResponseEntity<List<Accounts>> getAccountsByToken(@RequestBody String token) {
+//        List<Accounts> accounts = service.getAccountsByToken(token);
+//        return ResponseEntity.ok(accounts);
+//    }
 
 
 }

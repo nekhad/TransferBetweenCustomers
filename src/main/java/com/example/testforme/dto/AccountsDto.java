@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AccountsCreateRequestDTO {
+@AllArgsConstructor
+public class AccountsDto {
+    private String id;
     private String accountNumber;
     private String expirationDate;
     private String cvc;
     private boolean isActive;
     private String currency;
-    private String token;
 }
