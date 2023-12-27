@@ -13,7 +13,6 @@ public interface UserRepository extends JpaRepository<User,String> {
     Optional<User> findUserById(String id);
 
 
-//
-//    @Query("select u from User u inner join Accounts t on t.user.id = u.id where t.id = :id")
-//    User getUserByToken(String token);
+    @Query("select u from User u inner join Token t on t.user.id = u.id where t.token = :token")
+    User getUserByToken(String token);
 }

@@ -16,5 +16,4 @@ public class AccountsRequestDTO {
     private String cvc;
     private boolean isActive;
     private String currency;
-    private String userId;
 }
