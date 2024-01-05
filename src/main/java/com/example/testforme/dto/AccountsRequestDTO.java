@@ -14,6 +14,6 @@ public class AccountsRequestDTO {
     private String accountNumber;
     private String expirationDate;
     private String cvc;
-    private boolean isActive;
+    private String isActive;
     private String currency;
 }

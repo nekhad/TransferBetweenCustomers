@@ -27,7 +27,7 @@ public class Accounts {
     private String cvc;
 
     @Column(name = "is_active")
-    private boolean isActive;
+    private String isActive;
 
     @Column(name = "balance")
     private double balance;
