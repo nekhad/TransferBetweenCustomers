@@ -27,7 +27,7 @@ public class AccountsService {
                     .cvc(dto.getCvc())
                     .currency(dto.getCurrency())
                     .expirationDate(dto.getExpirationDate())
-                    .isActive(dto.isActive())
+                    .isActive(dto.getIsActive())
                     .balance(0)
                     .status("A")
                     .user(userRepository.getUserByToken(dto.getToken()))
@@ -44,7 +44,7 @@ public class AccountsService {
         accounts.setCvc(dto.getCvc());
         accounts.setCurrency(dto.getCurrency());
         accounts.setExpirationDate(dto.getExpirationDate());
-        accounts.setActive(dto.isActive());
+        accounts.setIsActive(dto.getIsActive());
         repository.save(accounts);
     }
 
@@ -64,7 +64,7 @@ public class AccountsService {
                     .id(account.getId())
                     .accountNumber(account.getAccountNumber())
                     .expirationDate(account.getExpirationDate())
-                    .isActive(account.isActive())
+                    .isActive(account.getIsActive())
                     .currency(account.getCurrency())
                     .cvc(account.getCvc())
                     .build();
