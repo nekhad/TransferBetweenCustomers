@@ -1,5 +1,6 @@
 package com.example.testforme.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,7 @@ public class Token {
     public boolean expired;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     public User user;
 }

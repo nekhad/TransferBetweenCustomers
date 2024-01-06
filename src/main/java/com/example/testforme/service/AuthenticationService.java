@@ -8,12 +8,16 @@ import com.example.testforme.repository.TokenRepository;
 import com.example.testforme.repository.UserRepository;
 import com.example.testforme.repository.VerificationRepository;
 import com.example.testforme.security.*;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -28,7 +32,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-//    private final JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
     private final VerificationRepository verificationRepository;
 
     public AuthenticationResponse register(RegisterRequest request) {
@@ -52,6 +56,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(null)
                 .message("Successfully")
+                .firstName(user.getFirstname())
+                .lastName(user.getLastname())
                 .build();
     }
 
@@ -69,7 +75,7 @@ public class AuthenticationService {
         user.setEmail(sendCodeAgainRequest.getEmail());
         user.setVerified(false);
         System.out.println("sendVerificationCode(user.getId())" +"Start OLDUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//        sendVerificationCode(user.getId());
+        sendVerificationCode(user.getId());
 
 
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
@@ -138,7 +144,7 @@ public class AuthenticationService {
     public void sendVerificationCode(String userId) {
         User user = repository.findUserById(userId).orElse(null);
         if (user != null && !user.isVerified()) {
-//            sendEmail(user.getEmail(), verificationRepository.findVerificationCodesWithStatusA());
+            sendEmail(user.getEmail(), verificationRepository.findVerificationCodesWithStatusA());
         }
     }
     @Transactional
@@ -166,17 +172,17 @@ public class AuthenticationService {
         int code = 100000 + random.nextInt(900000);
         return String.valueOf(code);
     }
-//    private void sendEmail(String email, String verificationCode) {
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message);
-//        try {
-//            helper.setTo(email);
-//            helper.setSubject("Email Verification Code");
-//            helper.setText("Your verification code is: " + verificationCode);
-//            mailSender.send(message);
-//        } catch (MessagingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    private void sendEmail(String email, String verificationCode) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        try {
+            helper.setTo(email);
+            helper.setSubject("Email Verification Code");
+            helper.setText("Your verification code is: " + verificationCode);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

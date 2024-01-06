@@ -15,6 +15,6 @@ public class SendCodeAgainRequest {
     private String lastname;
     private String email;
     private String password;
-    private String verificationCode;
-    String  status;
+//    private String verificationCode;
+//    String  status;
 }

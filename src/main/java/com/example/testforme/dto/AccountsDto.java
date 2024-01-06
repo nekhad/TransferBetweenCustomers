@@ -16,4 +16,6 @@ public class AccountsDto {
     private String cvc;
     private String isActive;
     private String currency;
+    private String firstName;
+    private String lastName;
 }
