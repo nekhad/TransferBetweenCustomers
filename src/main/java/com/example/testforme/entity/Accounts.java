@@ -3,6 +3,7 @@ package com.example.testforme.entity;
 
 import com.example.testforme.security.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -16,6 +17,7 @@ public class Accounts {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
 
     @Column(name = "account_number")
     private String accountNumber;
