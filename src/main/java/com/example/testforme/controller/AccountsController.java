@@ -1,7 +1,6 @@
 package com.example.testforme.controller;
 
 import com.example.testforme.dto.*;
-import com.example.testforme.entity.Accounts;
 import com.example.testforme.service.AccountsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,32 +14,38 @@ import java.util.List;
 public class AccountsController {
     private final AccountsService service;
 
-    @PostMapping("/add")
+    @PostMapping("/create")
     public ResponseEntity<AccountsResponseDTO> addAccount(@RequestBody AccountsCreateRequestDTO requestDTO) {
         service.create(requestDTO);
         return ResponseEntity.ok(new AccountsResponseDTO("Account was created"));
     }
+
     @PostMapping("/delete")
     public ResponseEntity<AccountsResponseDTO> deleteAccount(@RequestBody AccountsDeleteDTO requestDTO) {
         service.delete(requestDTO.getId());
         return ResponseEntity.ok(new AccountsResponseDTO("Account was deleted successfully"));
     }
+
     @PostMapping("/update")
     public ResponseEntity<AccountsResponseDTO> updateAccount(@RequestBody AccountsRequestDTO requestDTO) {
         service.update(requestDTO);
         return ResponseEntity.ok(new AccountsResponseDTO("Account was updated successfully"));
     }
-    @PostMapping("/getAll")
-    public ResponseEntity<List<AccountsDto>> getAllAccounts(@RequestBody String  token) {
 
-        return ResponseEntity.ok(service.getAll(token));
+    @PostMapping("/get-active-cards")
+    public ResponseEntity<List<AccountsDto>> getActiveAccountsOfUser(@RequestBody TokenRequest tokenRequest) {
+        return ResponseEntity.ok(service.getActiveCardsOfUser(tokenRequest));
+    }
+    @PostMapping("/get-non-active-cards")
+    public ResponseEntity<List<AccountsDto>> getNonActiveAccountsOfUser(@RequestBody TokenRequest tokenRequest) {
+        return ResponseEntity.ok(service.getNonActiveCardsOfUser(tokenRequest));
     }
 
-//    @PostMapping("/getByToken")
-//    public ResponseEntity<List<Accounts>> getAccountsByToken(@RequestBody String token) {
-//        List<Accounts> accounts = service.getAccountsByToken(token);
-//        return ResponseEntity.ok(accounts);
-//    }
+    @PostMapping("/transfer")
+    public ResponseEntity<AccountsResponseDTO> transfer(@RequestBody AccountsTransferDTO dto) {
+        service.transfer(dto);
+        return ResponseEntity.ok(new AccountsResponseDTO("Transfer was successful"));
+    }
 
 
 }
