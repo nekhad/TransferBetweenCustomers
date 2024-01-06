@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-
+@ToString
 @Table(name = "_user")
 public class User implements UserDetails {
 
@@ -50,8 +50,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Getter(AccessLevel.NONE)
+
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Token> tokens;
 
     @Getter(AccessLevel.NONE)
