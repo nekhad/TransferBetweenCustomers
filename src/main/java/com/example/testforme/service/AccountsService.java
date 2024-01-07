@@ -21,17 +21,62 @@ public class AccountsService {
     public void create(AccountsCreateRequestDTO dto) {
         if (dto.getAccountNumber().length() == 16) {
             if (!repository.existsByAccountNumber(dto.getAccountNumber())) {
-                Accounts accounts = Accounts.builder()
-                        .accountNumber(dto.getAccountNumber())
-                        .cvc(dto.getCvc())
-                        .currency(dto.getCurrency())
-                        .expirationDate(dto.getExpirationDate())
-                        .isActive(dto.getIsActive())
-                        .balance(0)
-                        .status("A")
-                        .user(userRepository.getUserByToken(dto.getToken()))
-                        .build();
-                repository.save(accounts);
+                if(dto.getCurrency().equals("AZN")){
+                    Accounts accounts = Accounts.builder()
+                            .accountNumber(dto.getAccountNumber())
+                            .cvc(dto.getCvc())
+                            .currency(dto.getCurrency())
+                            .expirationDate(dto.getExpirationDate())
+                            .isActive(dto.getIsActive())
+                            .balance(0)
+                            .status("A")
+                            .currencyRate("1")
+                            .user(userRepository.getUserByToken(dto.getToken()))
+                            .build();
+                    repository.save(accounts);
+                }else if(dto.getCurrency().equals("USD")){
+                    Accounts accounts = Accounts.builder()
+                            .accountNumber(dto.getAccountNumber())
+                            .cvc(dto.getCvc())
+                            .currency(dto.getCurrency())
+                            .expirationDate(dto.getExpirationDate())
+                            .isActive(dto.getIsActive())
+                            .balance(0)
+                            .status("A")
+                            .currencyRate("1.7")
+                            .user(userRepository.getUserByToken(dto.getToken()))
+                            .build();
+                    repository.save(accounts);
+                }
+                else if(dto.getCurrency().equals("EURO")){
+                    Accounts accounts = Accounts.builder()
+                            .accountNumber(dto.getAccountNumber())
+                            .cvc(dto.getCvc())
+                            .currency(dto.getCurrency())
+                            .expirationDate(dto.getExpirationDate())
+                            .isActive(dto.getIsActive())
+                            .balance(0)
+                            .status("A")
+                            .currencyRate("2")
+                            .user(userRepository.getUserByToken(dto.getToken()))
+                            .build();
+                    repository.save(accounts);
+                }
+                else if(dto.getCurrency().equals("TL")){
+                    Accounts accounts = Accounts.builder()
+                            .accountNumber(dto.getAccountNumber())
+                            .cvc(dto.getCvc())
+                            .currency(dto.getCurrency())
+                            .expirationDate(dto.getExpirationDate())
+                            .isActive(dto.getIsActive())
+                            .balance(0)
+                            .status("A")
+                            .currencyRate("0.2")
+                            .user(userRepository.getUserByToken(dto.getToken()))
+                            .build();
+                    repository.save(accounts);
+                }
+
             } else {
                 throw new NotUniqueAccountNumber();
             }
@@ -50,13 +95,15 @@ public class AccountsService {
         validateAccounts(fromAccount, toAccount);
 
         double amount = Double.parseDouble(dto.getAmount());
+        double currencyRate = Double.parseDouble(dto.getCurrencyRate());
+
         validateAccountIsActive(toAccount);
         validateAccountIsActive(fromAccount);
 
-        validateSufficientBalance(fromAccount, amount);
+        validateSufficientBalance(fromAccount, amount*currencyRate);
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);
-        toAccount.setBalance(toAccount.getBalance() + amount);
+        fromAccount.setBalance(fromAccount.getBalance() - amount*currencyRate);
+        toAccount.setBalance(toAccount.getBalance() + amount*currencyRate);
 
         repository.save(fromAccount);
         repository.save(toAccount);
