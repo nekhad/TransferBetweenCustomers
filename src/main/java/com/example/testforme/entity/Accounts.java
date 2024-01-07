@@ -40,6 +40,9 @@ public class Accounts {
     @Column(name = "status")
     private String status;
 
+    @Column(name = "currency_rate")
+    private String currencyRate;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
