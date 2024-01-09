@@ -95,15 +95,22 @@ public class AccountsService {
         validateAccounts(fromAccount, toAccount);
 
         double amount = Double.parseDouble(dto.getAmount());
-        double currencyRate = Double.parseDouble(dto.getCurrencyRate());
+        String  currencyRateOfToAccountNumber = repository.getCurrencyRateByAccountNumber(toAccountNumber);
+        String currencyRateOfFromAccountNumber = repository.getCurrencyRateByAccountNumber(fromAccountNumber);
 
+        double currencyRateOfToAccountNumberDouble = Double.parseDouble(currencyRateOfToAccountNumber);
+        double currencyRateOfFromAccountNumberDouble = Double.parseDouble(currencyRateOfFromAccountNumber);
+
+        System.out.println(currencyRateOfToAccountNumberDouble);
+        System.out.println(currencyRateOfFromAccountNumberDouble);
         validateAccountIsActive(toAccount);
         validateAccountIsActive(fromAccount);
 
-        validateSufficientBalance(fromAccount, amount*currencyRate);
+        validateSufficientBalance(fromAccount, amount);
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount*currencyRate);
-        toAccount.setBalance(toAccount.getBalance() + amount*currencyRate);
+        fromAccount.setBalance(fromAccount.getBalance() - amount);
+        System.out.println((amount*currencyRateOfFromAccountNumberDouble)/currencyRateOfToAccountNumberDouble);
+        toAccount.setBalance(toAccount.getBalance() + ((amount*currencyRateOfFromAccountNumberDouble)/currencyRateOfToAccountNumberDouble));
 
         repository.save(fromAccount);
         repository.save(toAccount);

@@ -46,7 +46,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
-                .verified(request.isVerified())
+//                .verified(request.isVerified())
                 .build();
 
         var savedUser = repository.save(user);
@@ -73,6 +73,7 @@ public class AuthenticationService {
         verificationRepository.save(verification);
 //        sendCodeAgainRequest.setStatus("D");
         user.setEmail(sendCodeAgainRequest.getEmail());
+        System.out.println("asasas");
         user.setVerified(false);
         System.out.println("sendVerificationCode(user.getId())" +"Start OLDUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
         sendVerificationCode(user.getId());
@@ -179,6 +180,7 @@ public class AuthenticationService {
             helper.setTo(email);
             helper.setSubject("Email Verification Code");
             helper.setText("Your verification code is: " + verificationCode);
+            System.out.println("salaam");
             mailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
