@@ -15,6 +15,6 @@ public class AccountsCreateRequestDTO {
     private String cvc;
     private String isActive;
     private String currency;
-    private String currencyRate;
+//    private String currencyRate;
     private String token;
 }

@@ -21,4 +21,8 @@ public interface AccountsRepository extends JpaRepository<Accounts, String> {
     List<Accounts> getNonActiveAccountsOfOwners(String token);
 
     Accounts getByAccountNumber(String accountNumber);
+
+    @Query("select a.currencyRate from Accounts a " +
+            "where a.isActive = 'active' and a.accountNumber = :accountNumber")
+    String getCurrencyRateByAccountNumber(String accountNumber);
 }

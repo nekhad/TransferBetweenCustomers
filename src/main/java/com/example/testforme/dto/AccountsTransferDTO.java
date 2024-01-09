@@ -13,5 +13,4 @@ public class AccountsTransferDTO {
     private String toAccountNumber;
     private String fromAccountNumber;
     private String amount;
-    private String currencyRate;
 }

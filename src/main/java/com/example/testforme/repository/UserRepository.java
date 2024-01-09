@@ -14,7 +14,7 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
-    @Query("select u from User u where u.verified = true and u.id = :id")
+    @Query("select u from User u where u.id = :id")
     Optional<User> findUserById(String id);
 
     @Query("select u from User u inner join Token t on t.user.id = u.id where u.verified = true and t.token = :token")
