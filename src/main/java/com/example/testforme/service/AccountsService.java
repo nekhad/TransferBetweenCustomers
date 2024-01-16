@@ -4,9 +4,11 @@ import com.example.testforme.dto.*;
 import com.example.testforme.entity.Accounts;
 import com.example.testforme.exception.*;
 import com.example.testforme.repository.AccountsRepository;
+import com.example.testforme.repository.CurrencyRepository;
 import com.example.testforme.repository.UserRepository;
 import com.example.testforme.security.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,68 +16,28 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccountsService {
     private final AccountsRepository repository;
     private final UserRepository userRepository;
+    private final CurrencyRepository currencyRepository;
 
     public void create(AccountsCreateRequestDTO dto) {
         if (dto.getAccountNumber().length() == 16) {
             if (!repository.existsByAccountNumber(dto.getAccountNumber())) {
-                if(dto.getCurrency().equals("AZN")){
-                    Accounts accounts = Accounts.builder()
-                            .accountNumber(dto.getAccountNumber())
-                            .cvc(dto.getCvc())
-                            .currency(dto.getCurrency())
-                            .expirationDate(dto.getExpirationDate())
-                            .isActive(dto.getIsActive())
-                            .balance(0)
-                            .status("A")
-                            .currencyRate("1")
-                            .user(userRepository.getUserByToken(dto.getToken()))
-                            .build();
-                    repository.save(accounts);
-                }else if(dto.getCurrency().equals("USD")){
-                    Accounts accounts = Accounts.builder()
-                            .accountNumber(dto.getAccountNumber())
-                            .cvc(dto.getCvc())
-                            .currency(dto.getCurrency())
-                            .expirationDate(dto.getExpirationDate())
-                            .isActive(dto.getIsActive())
-                            .balance(0)
-                            .status("A")
-                            .currencyRate("1.7")
-                            .user(userRepository.getUserByToken(dto.getToken()))
-                            .build();
-                    repository.save(accounts);
-                }
-                else if(dto.getCurrency().equals("EURO")){
-                    Accounts accounts = Accounts.builder()
-                            .accountNumber(dto.getAccountNumber())
-                            .cvc(dto.getCvc())
-                            .currency(dto.getCurrency())
-                            .expirationDate(dto.getExpirationDate())
-                            .isActive(dto.getIsActive())
-                            .balance(0)
-                            .status("A")
-                            .currencyRate("2")
-                            .user(userRepository.getUserByToken(dto.getToken()))
-                            .build();
-                    repository.save(accounts);
-                }
-                else if(dto.getCurrency().equals("TL")){
-                    Accounts accounts = Accounts.builder()
-                            .accountNumber(dto.getAccountNumber())
-                            .cvc(dto.getCvc())
-                            .currency(dto.getCurrency())
-                            .expirationDate(dto.getExpirationDate())
-                            .isActive(dto.getIsActive())
-                            .balance(0)
-                            .status("A")
-                            .currencyRate("0.2")
-                            .user(userRepository.getUserByToken(dto.getToken()))
-                            .build();
-                    repository.save(accounts);
-                }
+                Accounts accounts = Accounts.builder()
+                        .accountNumber(dto.getAccountNumber())
+                        .cvc(dto.getCvc())
+                        .currency(dto.getCurrencyId())
+                        .expirationDate(dto.getExpirationDate())
+                        .isActive(dto.getIsActive())
+                        .balance(0)
+                        .status("A")
+                        .currencyRate(dto.getCurrencyId())
+                        .user(userRepository.getUserByToken(dto.getToken()))
+                        .build();
+                repository.save(accounts);
+
 
             } else {
                 throw new NotUniqueAccountNumber();
@@ -88,29 +50,32 @@ public class AccountsService {
     public void transfer(AccountsTransferDTO dto) {
         String fromAccountNumber = dto.getFromAccountNumber();
         String toAccountNumber = dto.getToAccountNumber();
-
+        String currencyId = dto.getCurrency();
         Accounts fromAccount = repository.getByAccountNumber(fromAccountNumber);
         Accounts toAccount = repository.getByAccountNumber(toAccountNumber);
 
+        String currencyRate = currencyRepository.getCurrencyRateByCurrencyId(currencyId);
+        double currencyRateDouble = Double.parseDouble(currencyRate);
         validateAccounts(fromAccount, toAccount);
 
         double amount = Double.parseDouble(dto.getAmount());
-        String  currencyRateOfToAccountNumber = repository.getCurrencyRateByAccountNumber(toAccountNumber);
+        String currencyRateOfToAccountNumber = repository.getCurrencyRateByAccountNumber(toAccountNumber);
         String currencyRateOfFromAccountNumber = repository.getCurrencyRateByAccountNumber(fromAccountNumber);
 
         double currencyRateOfToAccountNumberDouble = Double.parseDouble(currencyRateOfToAccountNumber);
         double currencyRateOfFromAccountNumberDouble = Double.parseDouble(currencyRateOfFromAccountNumber);
 
-        System.out.println(currencyRateOfToAccountNumberDouble);
-        System.out.println(currencyRateOfFromAccountNumberDouble);
+        log.info("currencyRateOfToAccountNumberDouble equals : " + currencyRateOfToAccountNumberDouble);
+        log.info("currencyRateOfFromAccountNumberDouble equals : " + currencyRateOfFromAccountNumberDouble);
         validateAccountIsActive(toAccount);
         validateAccountIsActive(fromAccount);
 
-        validateSufficientBalance(fromAccount, amount);
+        validateSufficientBalance(fromAccount, (amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble);
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);
-        System.out.println((amount*currencyRateOfFromAccountNumberDouble)/currencyRateOfToAccountNumberDouble);
-        toAccount.setBalance(toAccount.getBalance() + ((amount*currencyRateOfFromAccountNumberDouble)/currencyRateOfToAccountNumberDouble));
+        fromAccount.setBalance(fromAccount.getBalance() - ((amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble));
+        log.info( "Reduced amount equals : " + (((amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble)));
+        toAccount.setBalance(toAccount.getBalance() + (amount * currencyRateDouble )/currencyRateOfToAccountNumberDouble);
+        log.info( "Increased amount equals : " + (((amount * currencyRateDouble )/currencyRateOfToAccountNumberDouble)));
 
         repository.save(fromAccount);
         repository.save(toAccount);
@@ -169,7 +134,6 @@ public class AccountsService {
                     .build();
             accountsDto.add(accountsDto1);
         }
-        System.out.println(accountsDto);
         return accountsDto;
     }
 
