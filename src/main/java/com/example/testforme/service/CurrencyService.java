@@ -57,26 +57,30 @@ public class CurrencyService {
     }
 
     public void getRecentCurrentData(CurrencyResponseDTO currencyResponseDTO) {
-        LocalDateTime now = LocalDateTime.now().minusSeconds(30);
-        List<Currency> reminders = currencyRepository.findByUpdatedDateBefore(now);
-        if(reminders.isEmpty()){
-            List<Currency> currencies = new ArrayList<>();
-            for (String key: currencyResponseDTO.getRates().keySet()) {
-                Currency currency = new Currency();
-                currency.setUpdatedDate(LocalDateTime.now());
-                currency.setCurrencyType(key);
-                currency.setRate(currencyResponseDTO.getRates().get(key));
-                currencies.add(currency);
-            }
-            currencyRepository.saveAll(currencies);
-
-        }
-        for (Currency currency : reminders) {
+        LocalDateTime now = LocalDateTime.now().minusSeconds(70);
+        LocalDateTime now1 = LocalDateTime.now();
+        System.out.println(now + "nowwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+        System.out.println(now1 + "nowwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww11111111");
+        List<Currency> reminders = currencyRepository.findByUpdatedDateBetween(now,now1);
+        System.out.println(reminders + "Remindersssssssssss");
+        if (reminders.isEmpty()) {
+        List<Currency> currencies = new ArrayList<>();
+        for (String key : currencyResponseDTO.getRates().keySet()) {
+            Currency currency = new Currency();
             currency.setUpdatedDate(LocalDateTime.now());
-            currency.setCurrencyType(currencyResponseDTO.getCurrencyType());
-            currency.setRate(currencyResponseDTO.getRates().get("rates"));
-            currencyRepository.save(currency);
+            currency.setCurrencyType(key);
+            currency.setRate(currencyResponseDTO.getRates().get(key));
+            currencies.add(currency);
         }
+        currencyRepository.saveAll(currencies);
+
+        } else {
+            for (Currency currency : reminders) {
+                currency.setUpdatedDate(LocalDateTime.now());
+                currencyRepository.save(currency);
+                System.out.println("salaaaaaaam");
+            }
     }
 
+    }
 }

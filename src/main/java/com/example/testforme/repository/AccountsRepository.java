@@ -22,7 +22,7 @@ public interface AccountsRepository extends JpaRepository<Accounts, String> {
 
     Accounts getByAccountNumber(String accountNumber);
 
-    @Query("select a.currencyRate from Accounts a " +
+    @Query("select c.rate from Currency c inner join Accounts a on c.id = a.currency " +
             "where a.isActive = 'active' and a.accountNumber = :accountNumber")
     String getCurrencyRateByAccountNumber(String accountNumber);
 }

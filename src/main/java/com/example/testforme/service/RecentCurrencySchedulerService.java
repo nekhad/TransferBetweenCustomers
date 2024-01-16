@@ -13,7 +13,7 @@ public class RecentCurrencySchedulerService {
 
     private final CurrencyService currencyService;
 
-    @Scheduled(cron = "0/30 * * * * *")
+//    @Scheduled(cron = "0/60 * * * * *")
     public void recentCurrencyData() {
         log.info("Inside recentCurrencyData : ");
 
