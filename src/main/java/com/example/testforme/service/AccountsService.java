@@ -28,7 +28,7 @@ public class AccountsService {
                 Accounts accounts = Accounts.builder()
                         .accountNumber(dto.getAccountNumber())
                         .cvc(dto.getCvc())
-                        .currency(dto.getCurrencyId())
+                        .currency(currencyRepository.getCurrencyTypeById(dto.getCurrencyId()))
                         .expirationDate(dto.getExpirationDate())
                         .isActive(dto.getIsActive())
                         .balance(0)
@@ -72,10 +72,10 @@ public class AccountsService {
 
         validateSufficientBalance(fromAccount, (amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble);
 
-        fromAccount.setBalance(fromAccount.getBalance() - ((amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble));
-        log.info( "Reduced amount equals : " + (((amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble)));
-        toAccount.setBalance(toAccount.getBalance() + (amount * currencyRateDouble )/currencyRateOfToAccountNumberDouble);
-        log.info( "Increased amount equals : " + (((amount * currencyRateDouble )/currencyRateOfToAccountNumberDouble)));
+        fromAccount.setBalance(Math.round((fromAccount.getBalance() - ((amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble)) * 10 ) / 10.0);
+        log.info( "Reduced amount equals : " + (Math.round((fromAccount.getBalance() - ((amount * currencyRateDouble )/currencyRateOfFromAccountNumberDouble)) * 10 ) / 10.0));
+        toAccount.setBalance(Math.round((toAccount.getBalance() + ((amount * currencyRateDouble )/currencyRateOfToAccountNumberDouble)) * 10 ) / 10.0);
+        log.info( "Increased amount equals : " + (Math.round((toAccount.getBalance() + ((amount * currencyRateDouble )/currencyRateOfToAccountNumberDouble)) * 10 ) / 10.0));
 
         repository.save(fromAccount);
         repository.save(toAccount);
@@ -88,7 +88,7 @@ public class AccountsService {
     }
 
     private void validateAccountIsActive(Accounts account) {
-        if (!account.getIsActive().equals("active")) {
+        if (!account.getIsActive().equals("A")) {
             throw new AccountNotActiveException();
         }
     }
