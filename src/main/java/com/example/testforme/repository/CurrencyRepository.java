@@ -11,7 +11,10 @@ public interface CurrencyRepository extends JpaRepository<Currency, String> {
 
     List<Currency> findByUpdatedDateBetween(LocalDateTime localDateTime, LocalDateTime localDateTime2);
 
-    @Query("select c.rate from Currency c where c.id = :id")
-    String getCurrencyRateByCurrencyId(String id);
+    @Query("select c.rate from Currency c where c.currencyType = :currency")
+    String getCurrencyRateByCurrencyId(String currency);
+
+    @Query("select c.currencyType from Currency c where c.id = :id")
+    String getCurrencyTypeById(String id);
 
 }
