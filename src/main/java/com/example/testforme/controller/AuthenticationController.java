@@ -35,15 +35,7 @@ public class AuthenticationController {
                     .body(new AuthenticationResponse(null, "This email is already exist", null, null));
         }
     }
-    @PostMapping("/afterRegister")
-    public ResponseEntity<AuthenticationResponse> sendCodeToEmail(@RequestBody SendCodeAgainRequest sendCodeAgainRequest) {
-        try {
-            return ResponseEntity.ok(service.sendCodeToEmail(sendCodeAgainRequest));
-        } catch (NotUniqueUser ex) {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .body(new AuthenticationResponse(null, "+++++++++++++++++++", null, null));
-        }
-    }
+
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
