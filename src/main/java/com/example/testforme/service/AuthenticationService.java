@@ -12,6 +12,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class AuthenticationService {
     private final UserRepository repository;
     private final TokenRepository tokenRepository;
@@ -46,37 +48,26 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
-//                .verified(request.isVerified())
                 .build();
 
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
 
         saveUserToken(savedUser, jwtToken);
-        return AuthenticationResponse.builder()
-                .token(null)
-                .message("Successfully")
-                .firstName(user.getFirstname())
-                .lastName(user.getLastname())
-                .build();
-    }
 
-    public AuthenticationResponse sendCodeToEmail(SendCodeAgainRequest sendCodeAgainRequest) {
-        var user = repository.findByEmail(sendCodeAgainRequest.getEmail())
+        var user1 = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var verification = Verification.builder()
-                .user(user)
+                .user(user1)
                 .verificationCode(generateVerificationCode())
                 .status("A")
                 .build();
 
         verificationRepository.save(verification);
-//        sendCodeAgainRequest.setStatus("D");
-        user.setEmail(sendCodeAgainRequest.getEmail());
-        System.out.println("asasas");
-        user.setVerified(false);
-        System.out.println("sendVerificationCode(user.getId())" +"Start OLDUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-        sendVerificationCode(user.getId());
+        user1.setEmail(request.getEmail());
+        user1.setVerified(false);
+        log.info("sendVerificationCode Starts");
+        sendVerificationCode(user1.getId());
 
 
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
@@ -86,21 +77,21 @@ public class AuthenticationService {
         };
         service.scheduleAtFixedRate(runnable,1,1, TimeUnit.MINUTES);
 
-
         return AuthenticationResponse.builder()
                 .token(null)
-                .message("----------")
+                .message("Successfully")
+                .firstName(user.getFirstname())
+                .lastName(user.getLastname())
                 .build();
     }
+
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var userByEmail = repository.findByEmail(request.getEmail())
                 .orElseThrow(NotFoundUser::new);
         if (!passwordEncoder.matches(request.getPassword(), userByEmail.getPassword())) {
             throw new WrongPassword();
         }
-//        if(!userByEmail.isVerified()){
-//            throw new NotVerified();
-//        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -180,7 +171,7 @@ public class AuthenticationService {
             helper.setTo(email);
             helper.setSubject("Email Verification Code");
             helper.setText("Your verification code is: " + verificationCode);
-            System.out.println("salaam");
+            log.info("Helloo!!");
             mailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
