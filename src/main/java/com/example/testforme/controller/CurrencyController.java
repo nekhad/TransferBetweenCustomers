@@ -1,27 +1,41 @@
 package com.example.testforme.controller;
 
-import com.example.testforme.dto.CurrencyResponseDTO;
+import com.example.testforme.dto.*;
+import com.example.testforme.repository.CurrencyRepository;
 import com.example.testforme.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Currency;
+import java.util.List;
 
 @RestController
-@RequestMapping("/currencies")
+@RequestMapping("/api/currencies")
 @RequiredArgsConstructor
 public class CurrencyController {
 
     private final CurrencyService currencyService;
+    private final CurrencyRepository currencyRepository;
 
     @GetMapping("/latest")
     public ResponseEntity<CurrencyResponseDTO> currencyRates() {
         return ResponseEntity.status(HttpStatus.OK).body(currencyService.allCurrencyRates());
+    }
+    @GetMapping("/read")
+    public ResponseEntity<List<CurrencySelectBoxDTO>> getAllCurrencyRates() {
+        CurrencyResponseDTO currencyResponseDTO = currencyService.allCurrencyRates();
+        List<CurrencySelectBoxDTO> currencySelectBoxDTOList = currencyService.mapToCurrencySelectBoxDTO(currencyResponseDTO);
+        return new ResponseEntity<>(currencySelectBoxDTOList, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-currency")
+    public ResponseEntity<List<CurrencyReadDTO>> getAllCurrencies() {
+        CurrencyResponseDTO currencyResponseDTO = currencyService.allCurrencyRates();
+        List<CurrencyReadDTO> currencyReadDTOS = currencyService.mapToCurrencyReadDTO(currencyResponseDTO);
+        return new ResponseEntity<>(currencyReadDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/convert")
