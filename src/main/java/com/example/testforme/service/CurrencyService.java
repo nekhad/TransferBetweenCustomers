@@ -1,12 +1,15 @@
 package com.example.testforme.service;
 
+import com.example.testforme.dto.*;
+import com.example.testforme.entity.Accounts;
 import com.example.testforme.entity.Currency;
-import com.example.testforme.dto.CurrencyResponseDTO;
 import com.example.testforme.exception.ErrorMessage;
 import com.example.testforme.repository.CurrencyRepository;
+import com.example.testforme.security.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,24 @@ public class CurrencyService {
 
     public CurrencyResponseDTO allCurrencyRates() {
         return restTemplate.getForObject(url, CurrencyResponseDTO.class);
+    }
+
+    public List<CurrencyReadDTO> mapToCurrencyReadDTO(CurrencyResponseDTO currencyResponseDTO) {
+        return currencyResponseDTO.getRates().entrySet().stream()
+                .map(entry -> CurrencyReadDTO.builder()
+                        .rate(entry.getValue())
+                        .currencyType(entry.getKey())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<CurrencySelectBoxDTO> mapToCurrencySelectBoxDTO(CurrencyResponseDTO currencyResponseDTO) {
+        return currencyResponseDTO.getRates().entrySet().stream()
+                .map(entry -> CurrencySelectBoxDTO.builder()
+                        .id(entry.getKey())
+                        .currencyType(entry.getKey())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public double getSpecificExchangeRate(String sourceCurrency, String targetCurrency, LocalDate date) {
@@ -64,19 +86,19 @@ public class CurrencyService {
         LocalDateTime now1 = LocalDateTime.now();
         log.info("Before 70 seconds from now" + now);
         log.info("Real Now" + now1);
-        List<Currency> reminders = currencyRepository.findByUpdatedDateBetween(now,now1);
+        List<Currency> reminders = currencyRepository.findByUpdatedDateBetween(now, now1);
         System.out.println(reminders + "results");
         log.info("reminders" + reminders);
         if (reminders.isEmpty()) {
-        List<Currency> currencies = new ArrayList<>();
-        for (String key : currencyResponseDTO.getRates().keySet()) {
-            Currency currency = new Currency();
-            currency.setUpdatedDate(LocalDateTime.now());
-            currency.setCurrencyType(key);
-            currency.setRate(Math.round(currencyResponseDTO.getRates().get(key) * 10.0) / 10.0);
-            currencies.add(currency);
-        }
-        currencyRepository.saveAll(currencies);
+            List<Currency> currencies = new ArrayList<>();
+            for (String key : currencyResponseDTO.getRates().keySet()) {
+                Currency currency = new Currency();
+                currency.setUpdatedDate(LocalDateTime.now());
+                currency.setCurrencyType(key);
+                currency.setRate(Math.round(currencyResponseDTO.getRates().get(key) * 10.0) / 10.0);
+                currencies.add(currency);
+            }
+            currencyRepository.saveAll(currencies);
 
         } else {
             for (Currency currency : reminders) {
@@ -84,7 +106,7 @@ public class CurrencyService {
                 currencyRepository.save(currency);
                 log.info("update loading...");
             }
-    }
+        }
 
     }
 }

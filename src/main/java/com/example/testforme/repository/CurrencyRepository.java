@@ -1,5 +1,6 @@
 package com.example.testforme.repository;
 
+import com.example.testforme.dto.CurrencyReadDTO;
 import com.example.testforme.entity.Currency;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,3 +19,4 @@ public interface CurrencyRepository extends JpaRepository<Currency, String> {
     String getCurrencyTypeById(String id);
 
 }
+
