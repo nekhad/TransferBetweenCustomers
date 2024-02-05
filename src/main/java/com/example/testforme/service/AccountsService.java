@@ -28,7 +28,7 @@ public class AccountsService {
                 Accounts accounts = Accounts.builder()
                         .accountNumber(dto.getAccountNumber())
                         .cvc(dto.getCvc())
-                        .currency(currencyRepository.getCurrencyTypeById(dto.getCurrencyId()))
+                        .currency(dto.getCurrencyId())
                         .expirationDate(dto.getExpirationDate())
                         .isActive(dto.getIsActive())
                         .balance(0)
